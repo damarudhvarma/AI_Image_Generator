@@ -1,35 +1,39 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import { generateImage } from './genrateImageController.js';
-
 import cors from 'cors';
 
 
-const app = express()
-const port = 3000
+dotenv.config();
 
-app.use(cors());
-app.use(express.static('public'))
+const app = express();
+const port = process.env.PORT || 3000;
 
+app.use(cors({
+  origin: process.env.FRONTEND_URL, 
+  methods: ['GET', 'POST'], 
+  credentials: true 
+}));
+
+app.use(express.static('public'));
 app.use(express.json());
 
-
 app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
+  res.send('Hello World!');
+});
 
-app.post('/api/generate-image', async (req,res)=>{
-  const { prompt } = req.body; // Extract the prompt from the request body
+app.post('/api/generate-image', async (req, res) => {
+  const { prompt } = req.body; 
   
-  if (!prompt.length) {
+  if (!prompt || !prompt.length) {
     return res.status(400).send('Prompt is required');
   }
-  
-  await generateImage(prompt)
-  res.send('http://localhost:3000/generated_image.jpg');
 
+  await generateImage(prompt); 
+  
+  res.send(`${req.protocol}://${req.get('host')}/generated_image.jpg`);
 });
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+  console.log(`Backend running on port ${port}`);
+});
