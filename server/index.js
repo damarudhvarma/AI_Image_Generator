@@ -24,21 +24,23 @@ app.get('/', (req, res) => {
 
 // Endpoint to generate an image
 app.post('/api/generate-image', async (req, res) => {
-  const { prompt } = req.body;
-
-  // Check if the prompt is provided
+  const { prompt } = req.body; 
+  
   if (!prompt || !prompt.length) {
     return res.status(400).send('Prompt is required');
   }
 
   try {
-    await generateImage(prompt); // Generate the image using the provided prompt
-    res.send(`${req.protocol}://${req.get('host')}/generated_image.jpg`); // Send the image URL as the response
+    await generateImage(prompt); 
+    // Use HTTPS protocol
+    const imageUrl = `https://${req.get('host')}/generated_image.jpg`;
+    res.send(imageUrl); // Send the image URL as the response
   } catch (error) {
     console.error(error);
     res.status(500).send('Error generating image'); // Handle errors gracefully
   }
 });
+
 
 // Start the server
 app.listen(port, () => {
